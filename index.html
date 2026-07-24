@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pomodoro Tracker</title>
+<meta name="description" content="Temporizador Pomodoro con registro de laps, resúmenes y gráficas semanales y mensuales." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍅</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">🍅</span>
+      <h1>Pomodoro Tracker</h1>
+    </div>
+    <div class="header-actions">
+      <label class="theme-toggle" title="Cambiar tema">
+        <input type="checkbox" id="themeToggle" />
+        <span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span>
+      </label>
+      <button id="settingsBtn" class="icon-btn" type="button" aria-haspopup="dialog" aria-controls="settingsPanel">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94a7.14 7.14 0 0 0 .06-.94 7.14 7.14 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.62-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.32.6.22l2.39-.96c.49.38 1.03.7 1.62.94l.36 2.54a.5.5 0 0 0 .5.42h3.84a.5.5 0 0 0 .5-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.24.1.5 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z"/></svg>
+        <span>Ajustes</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- TIMER -->
+    <section class="card timer-card" aria-labelledby="timerHeading">
+      <h2 id="timerHeading" class="sr-only">Temporizador</h2>
+
+      <div class="session-badge" id="sessionBadge" data-phase="work">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="sessionLabel">Trabajo</span>
+      </div>
+
+      <div class="timer-ring-wrap">
+        <svg class="timer-ring" viewBox="0 0 220 220" width="280" height="280" role="img" aria-labelledby="timerDesc">
+          <title id="timerDesc">Progreso de la sesión actual</title>
+          <circle class="ring-track" cx="110" cy="110" r="100"></circle>
+          <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="100"></circle>
+        </svg>
+        <div class="timer-center">
+          <div class="timer-display" id="timerDisplay">25:00</div>
+          <div class="timer-sub" id="timerSub">Pomodoro 1 de 4</div>
+        </div>
+      </div>
+
+      <div class="timer-controls">
+        <button id="startPauseBtn" class="btn btn-primary" type="button">Iniciar</button>
+        <button id="skipBtn" class="btn btn-ghost" type="button">Saltar</button>
+        <button id="resetBtn" class="btn btn-ghost" type="button">Reiniciar</button>
+      </div>
+
+      <div class="autorun-row">
+        <label class="switch-label">
+          <input type="checkbox" id="autoStartToggle" checked />
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span>Ejecutar automáticamente (trabajo → descanso → trabajo)</span>
+        </label>
+      </div>
+
+      <div class="daily-goal">
+        <div class="daily-goal-head">
+          <span>Objetivo diario</span>
+          <span id="dailyGoalText">0 / 120 min</span>
+        </div>
+        <div class="meter" role="progressbar" aria-labelledby="dailyGoalText" aria-valuemin="0" aria-valuemax="120" aria-valuenow="0" id="dailyGoalMeter">
+          <div class="meter-fill" id="dailyGoalFill" style="width:0%"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stat-grid" aria-label="Resumen de estadísticas">
+      <div class="stat-tile">
+        <span class="stat-label">Hoy</span>
+        <span class="stat-value" id="statToday">0m</span>
+        <span class="stat-sub" id="statTodayCount">0 pomodoros</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-label">Esta semana</span>
+        <span class="stat-value" id="statWeek">0m</span>
+        <span class="stat-sub" id="statWeekCount">0 pomodoros</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-label">Este mes</span>
+        <span class="stat-value" id="statMonth">0m</span>
+        <span class="stat-sub" id="statMonthCount">0 pomodoros</span>
+      </div>
+      <div class="stat-tile">
+        <span class="stat-label">Racha actual</span>
+        <span class="stat-value" id="statStreak">0</span>
+        <span class="stat-sub" id="statStreakSub">días seguidos</span>
+      </div>
+    </section>
+
+    <!-- CHARTS -->
+    <section class="card" aria-labelledby="weekChartHeading">
+      <div class="card-head">
+        <h2 id="weekChartHeading">Esta semana</h2>
+        <button class="link-btn" type="button" data-table-toggle="weekChart">Ver tabla</button>
+      </div>
+      <p class="card-caption">Minutos enfocados por día (lun–dom)</p>
+      <div id="weekChart" class="chart-mount"></div>
+    </section>
+
+    <section class="card" aria-labelledby="monthChartHeading">
+      <div class="card-head">
+        <h2 id="monthChartHeading">Este mes</h2>
+        <button class="link-btn" type="button" data-table-toggle="monthChart">Ver tabla</button>
+      </div>
+      <p class="card-caption">Minutos enfocados por día del mes</p>
+      <div id="monthChart" class="chart-mount"></div>
+    </section>
+
+    <!-- LAPS -->
+    <section class="card" aria-labelledby="lapsHeading">
+      <div class="card-head">
+        <h2 id="lapsHeading">Laps de hoy</h2>
+        <button class="link-btn danger" type="button" id="clearTodayBtn">Borrar hoy</button>
+      </div>
+      <div class="laps-table-wrap">
+        <table class="laps-table" id="lapsTable">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Inicio</th>
+              <th scope="col">Fin</th>
+              <th scope="col">Duración</th>
+            </tr>
+          </thead>
+          <tbody id="lapsBody">
+            <tr class="empty-row"><td colspan="5">Todavía no hay pomodoros hoy. ¡Presiona Iniciar!</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Tus datos se guardan solo en este navegador (localStorage). <button class="link-btn danger" type="button" id="clearAllBtn">Borrar todo el historial</button></p>
+  </footer>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="overlay" id="overlay" hidden></div>
+<aside class="settings-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsHeading" hidden>
+  <div class="settings-head">
+    <h2 id="settingsHeading">Ajustes</h2>
+    <button class="icon-btn" id="closeSettingsBtn" type="button" aria-label="Cerrar ajustes">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.7l-1.41-1.41L9.17 12 2.89 5.71 4.3 4.29l6.29 6.3 6.29-6.3z"/></svg>
+    </button>
+  </div>
+
+  <form id="settingsForm" class="settings-form">
+    <div class="field-row">
+      <label for="workMin">Duración de trabajo (min)</label>
+      <input type="number" id="workMin" min="1" max="180" step="1" value="25" required />
+    </div>
+    <div class="field-row">
+      <label for="shortBreakMin">Descanso corto (min)</label>
+      <input type="number" id="shortBreakMin" min="1" max="60" step="1" value="5" required />
+    </div>
+    <div class="field-row">
+      <label for="longBreakMin">Descanso largo (min)</label>
+      <input type="number" id="longBreakMin" min="1" max="90" step="1" value="15" required />
+    </div>
+    <div class="field-row">
+      <label for="cycleLength">Pomodoros antes del descanso largo</label>
+      <input type="number" id="cycleLength" min="2" max="12" step="1" value="4" required />
+    </div>
+    <div class="field-row">
+      <label for="dailyGoalMin">Objetivo total de trabajo por día (min)</label>
+      <input type="number" id="dailyGoalMin" min="10" max="960" step="5" value="120" required />
+    </div>
+    <div class="field-row switch-row">
+      <label class="switch-label">
+        <input type="checkbox" id="soundToggle" checked />
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+        <span>Sonido al terminar cada fase</span>
+      </label>
+    </div>
+    <div class="field-row switch-row">
+      <label class="switch-label">
+        <input type="checkbox" id="notifyToggle" />
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+        <span>Notificaciones del navegador</span>
+      </label>
+    </div>
+    <p class="settings-hint">Los cambios se aplican a la sesión actual y a las siguientes. Si hay un temporizador corriendo, se reinicia la fase actual con la nueva duración.</p>
+    <div class="settings-actions">
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
