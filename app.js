@@ -249,10 +249,28 @@
    * Sound + notifications
    * ------------------------------------------------------------------- */
   let audioCtx = null;
+
+  // AudioContext must be created/resumed from within a real user gesture or
+  // browsers keep it "suspended" forever, silently dropping every sound
+  // scheduled from the (gesture-less) timer interval. Call this from click
+  // handlers so it's ready by the time the countdown reaches zero.
+  function unlockAudio() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    } catch (e) { /* audio unavailable — ignore */ }
+  }
+  // Catch-all: unlock on the very first interaction anywhere on the page, in
+  // case it isn't a click on Start/Guardar (e.g. a stray tap or keypress).
+  ["pointerdown", "keydown"].forEach((evt) =>
+    document.addEventListener(evt, unlockAudio, { once: true, passive: true })
+  );
+
   function playChime() {
     if (!db.settings.sound) return;
     try {
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      unlockAudio();
+      if (!audioCtx || audioCtx.state !== "running") return;
       const now = audioCtx.currentTime;
       [523.25, 659.25, 783.99].forEach((freq, i) => {
         const osc = audioCtx.createOscillator();
@@ -749,6 +767,7 @@
 
   el.settingsForm.addEventListener("submit", (e) => {
     e.preventDefault();
+    unlockAudio();
     db.settings.workMin = clampInt(el.workMin.value, 1, 180, db.settings.workMin);
     db.settings.shortBreakMin = clampInt(el.shortBreakMin.value, 1, 60, db.settings.shortBreakMin);
     db.settings.longBreakMin = clampInt(el.longBreakMin.value, 1, 90, db.settings.longBreakMin);
@@ -816,6 +835,7 @@
    * Wire controls
    * ------------------------------------------------------------------- */
   el.startPauseBtn.addEventListener("click", () => {
+    unlockAudio();
     if (state.isRunning) pause(); else start();
   });
   el.skipBtn.addEventListener("click", skipPhase);
