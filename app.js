@@ -272,17 +272,23 @@
       unlockAudio();
       if (!audioCtx || audioCtx.state !== "running") return;
       const now = audioCtx.currentTime;
+      // Compressor + master gain: much louder than a bare oscillator without clipping.
+      const comp = audioCtx.createDynamicsCompressor();
+      const master = audioCtx.createGain();
+      master.gain.value = 1.0;
+      comp.connect(master).connect(audioCtx.destination);
       [523.25, 659.25, 783.99].forEach((freq, i) => {
+        const t = now + i * 0.18;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = "sine";
+        osc.type = "triangle";
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0, now + i * 0.14);
-        gain.gain.linearRampToValueAtTime(0.18, now + i * 0.14 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.14 + 0.32);
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(now + i * 0.14);
-        osc.stop(now + i * 0.14 + 0.34);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.8, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+        osc.connect(gain).connect(comp);
+        osc.start(t);
+        osc.stop(t + 0.52);
       });
     } catch (e) { /* audio unavailable — ignore */ }
   }

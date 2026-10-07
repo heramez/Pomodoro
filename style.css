@@ -181,7 +181,7 @@ body {
 .session-badge[data-phase="long_break"] { color: var(--series-2); }
 
 .timer-ring-wrap { position: relative; width: 280px; height: 280px; margin-bottom: 22px; }
-.timer-ring { transform: rotate(-90deg); }
+.timer-ring { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track {
   fill: none; stroke: var(--gridline); stroke-width: 10;
 }
@@ -384,7 +384,9 @@ body {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .timer-ring-wrap { width: 240px; height: 240px; }
   .timer-display { font-size: 44px; }
-  .timer-controls { flex-wrap: wrap; justify-content: center; }
+  .timer-controls { flex-wrap: nowrap; justify-content: center; gap: 8px; }
+  .timer-controls .btn { padding: 11px 14px; }
+  .btn-primary { min-width: 96px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
