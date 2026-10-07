@@ -336,6 +336,9 @@ body {
 /* FOOTER */
 .app-footer { text-align: center; margin-top: 8px; }
 .app-footer p { font-size: 12px; color: var(--text-muted); }
+.app-footer .app-credito { margin-top: 8px; }
+.app-footer .app-credito a { color: inherit; text-decoration: underline dotted; text-underline-offset: 3px; }
+.app-footer .app-credito a:hover, .app-footer .app-credito a:focus-visible { color: var(--text-primary); }
 
 /* SETTINGS PANEL */
 .overlay {
